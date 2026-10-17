@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "io.github.grom1143.microtest",
+      "sha256_cert_fingerprints": [
+        "14:C1:45:0D:FC:ED:02:10:FF:57:7A:2A:30:53:54:F0:3E:AF:9B:F9:6B:A9:66:E0:E0:6D:09:14:6E:8D:F4:7C"
+      ]
+    }
+  }
+]
