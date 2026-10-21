@@ -1,0 +1,404 @@
+<title>Финансовый навигатор МСП Дона</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Простая страница: шапка с вкладками, одна колонка, системные шрифты */
+:root{
+  --bg:#f3f5f7; --panel:#ffffff; --ink:#1b2430; --muted:#5c6773; --line:#cfd6dd;
+  --accent:#1f5c99; --accent-ink:#ffffff; --ok:#2e7d32; --warn:#a86400; --bad:#b3261e;
+  --t1:#d9e7f5; --t2:#e8efcf; --t3:#f5e3cc; --t4:#e6ddf0; --t5:#d7efe9;
+  --f-body:"Segoe UI",Arial,Helvetica,sans-serif; --f-head:Georgia,"Times New Roman",serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#14181d; --panel:#1d232a; --ink:#e4e8ec; --muted:#9aa5b1; --line:#36404a;
+  --accent:#6fa8e0; --accent-ink:#0d1620; --ok:#7cc47f; --warn:#e0a54a; --bad:#ef7b72;
+  --t1:#24384d; --t2:#36401f; --t3:#4a3820; --t4:#3a3049; --t5:#1f4039; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14181d; --panel:#1d232a; --ink:#e4e8ec; --muted:#9aa5b1; --line:#36404a;
+  --accent:#6fa8e0; --accent-ink:#0d1620; --ok:#7cc47f; --warn:#e0a54a; --bad:#ef7b72;
+  --t1:#24384d; --t2:#36401f; --t3:#4a3820; --t4:#3a3049; --t5:#1f4039; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-body)}
+.wrap{max-width:980px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{background:var(--panel);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;justify-content:center;align-items:center;padding-block:12px}
+.brand{font:700 18px var(--f-head);text-align:center}
+main.wrap{padding-block:20px 40px;display:flex;flex-direction:column;gap:32px}
+[data-view]{scroll-margin-top:16px}
+h1,h2,h3{font-family:var(--f-head);margin:0;text-wrap:balance}
+h1{font-size:28px} h2{font-size:22px} h3{font-size:17px}
+p{margin:0}
+.box{background:var(--panel);border:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.muted{color:var(--muted)}
+.btn{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 14px;cursor:pointer}
+.btn[aria-pressed="true"]{border-color:var(--accent);font-weight:700}
+.btn.main{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:14px}
+input,select{font:inherit;padding:6px 8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);width:100%}
+.checks{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:14px}
+.checks label{display:flex;gap:6px;align-items:center}
+.checks input{width:auto}
+.card{border:1px solid var(--line);background:var(--panel);padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.card .top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.st{font-size:13px;font-weight:700}
+.st.ok{color:var(--ok)} .st.check{color:var(--warn)} .st.no{color:var(--bad)}
+.card ul{margin:0;padding-left:18px;font-size:14px}
+.kv{font-size:14px;color:var(--muted)}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:var(--bg)}
+.warn{margin-top:12px;padding:10px 14px;border:1px solid var(--warn);border-left-width:4px;background:var(--panel);font-size:14px}
+#cmpCount{font-weight:700}
+#cmpCount.alarm{color:var(--bad)}
+.combo{position:relative;display:flex}
+.combo input{flex:1;min-width:0}
+#plArrow{font:inherit;width:44px;flex:none;border:1px solid var(--line);border-left:0;background:var(--bg);color:var(--ink);cursor:pointer;font-size:16px}
+#plArrow[aria-expanded="true"]{background:var(--t1)}
+#plDrop{position:absolute;top:100%;left:0;right:0;z-index:4;max-height:320px;overflow-y:auto;margin:0;padding:0;list-style:none;background:var(--panel);border:1px solid var(--line);border-top:0;box-shadow:0 6px 16px rgba(0,0,0,.15)}
+#plDrop button{display:block;width:100%;text-align:left;font:inherit;padding:7px 10px;border:0;background:none;color:var(--ink);cursor:pointer}
+#plDrop button:hover,#plDrop button:focus-visible{background:var(--t1);outline:none}
+.tag{font-size:12px;padding:1px 7px;border:1px solid var(--line);background:var(--bg);color:var(--muted)}
+.card a{color:var(--accent)}
+mark{background:var(--t2);color:inherit}
+footer{font-size:13px;color:var(--muted);padding-block:0 30px}
+</style>
+
+<header><div class="wrap">
+  <div class="brand">Финансовый навигатор МСП Дона</div>
+</div></header>
+
+<main class="wrap">
+<section data-view="form">
+  <form class="box" id="f">
+    <h2>Анкета</h2>
+    <p class="muted">Заполните анкету или выберите пример, и навигатор покажет гранты, субсидии, займы и кредиты Ростовской области, которые вам подходят.</p>
+    <div class="row" id="exRow"><span class="muted">Примеры анкет:</span></div>
+    <div class="grid">
+      <label class="f">Кто вы<select id="fStatus"></select></label>
+      <label class="f">Возраст, лет<input id="fPAge" type="number" min="14" max="99"></label>
+      <label class="f">Район или город<select id="fDistrict"></select></label>
+      <label class="f">Сколько работает бизнес<select id="fAge">
+        <option value="0">Ещё не открыт</option><option value="6">Меньше года</option><option value="18">1–2 года</option><option value="40">2–5 лет</option><option value="72">Больше 5 лет</option></select></label>
+      <label class="f">Сфера<select id="fSphere"></select></label>
+      <label class="f">Цель<select id="fGoal"></select></label>
+      <label class="f">Сколько нужно, ₽<input id="fAmount" type="number" min="0" step="10000"></label>
+      <label class="f">Своих средств, %<input id="fOwn" type="number" min="0" max="100" step="5"></label>
+      <label class="f">Залог<select id="fColl"></select></label>
+    </div>
+    <div class="row"><button class="btn main" type="submit">Подобрать</button><button class="btn" type="button" id="fReset">Сбросить анкету</button></div>
+  </form>
+</section>
+
+<section data-view="res">
+  <div class="box"><h2>Подбор</h2><p class="muted" id="resSub">Заполните анкету и нажмите «Подобрать», и здесь появятся подходящие меры.</p></div>
+  <div id="resWrap" hidden>
+    <div class="warn" role="status"><b>Для сравнения можно отметить не больше трёх мер.</b> Поставьте галочку «В сравнение» у мер, которые хотите сравнить, и таблица появится ниже. <span id="cmpCount"></span></div>
+    <div class="row" id="geoRow" style="font-size:14px;margin-top:10px;gap:14px"><span class="muted">Показывать:</span><label class="row"><input type="radio" name="geo" value="all" checked style="width:auto">Все меры (федеральные — в конце)</label><label class="row"><input type="radio" name="geo" value="ro" style="width:auto">Только меры Ростовской области</label></div>
+    <div id="resList" style="display:flex;flex-direction:column;gap:10px;margin-top:12px"></div>
+  </div>
+</section>
+
+<section data-view="cmp">
+  <div class="box"><h2>Сравнение</h2><p class="muted">Отметьте до трёх мер в подборе галочкой «В сравнение», и таблица появится здесь. Платёж посчитан примерно, на нужную вам сумму.</p><div class="tbl" id="cmpTbl"><p class="muted">Пока ничего не выбрано.</p></div></div>
+</section>
+
+<section data-view="places">
+  <div class="box"><h2>Районы и города</h2>
+    <p class="muted">Введите название района или города, например «Азов» или «Сальск». Можно искать и по занятию: «рыба», «зерно», «туризм», и тогда появятся районы, где это развито.</p>
+    <div class="combo">
+      <input id="plQ" type="search" placeholder="Район, город или чем занимаетесь" autocomplete="off" aria-label="Поиск района или города" aria-controls="plDrop">
+      <button type="button" id="plArrow" aria-label="Показать список районов и городов" aria-expanded="false" aria-controls="plDrop">▾</button>
+      <ul id="plDrop" role="listbox" aria-label="Районы и города" hidden></ul>
+    </div>
+    <div class="row" id="plKind">
+      <label class="row" style="font-size:14px"><input type="radio" name="plk" value="all" checked style="width:auto">Все</label>
+      <label class="row" style="font-size:14px"><input type="radio" name="plk" value="d" style="width:auto">Районы</label>
+      <label class="row" style="font-size:14px"><input type="radio" name="plk" value="c" style="width:auto">Города</label>
+    </div>
+    <p class="muted" id="plCount"></p>
+  </div>
+  <div id="plList" style="display:flex;flex-direction:column;gap:10px;margin-top:12px"></div>
+</section>
+</main>
+<footer class="wrap">Решение о поддержке принимает организация, которая ведёт программу: перед подачей проверьте условия у неё или на МСП.РФ. Учебный проект ДГТУ.</footer>
+
+<script>
+const D = {"TYPE":{"grant":"Грант","subsidy":"Субсидия","zaem":"Заём","credit":"Кредит","garant":"Гарантия","leasing":"Лизинг","consult":"Консультации","property":"Имущество"},"FORM":{"plan":"Планирую открыть","self":"Самозанятый","ip":"ИП","kfh":"КФХ","ul":"ООО / юрлицо"},"GOAL":{"open":"Открытие бизнеса","equip":"Покупка оборудования","tech":"Техника и транспорт","rent":"Помещение и аренда","working":"Оборотные средства","develop":"Развитие и расширение","raw":"Сырьё, корма, зарыбление, посадочный материал","export":"Выход на экспорт","learn":"Обучение и консультации"},"COLL":{"none":"Нет","partial":"Частично или есть поручитель","yes":"Есть"},"DEBT":{"":"Не знаю","none":"Нет","small":"До 10 тыс. ₽","mid":"До 50 тыс. ₽","big":"Больше 50 тыс. ₽"},"REQ":{"student":"Я студент","lowincome":"Малоимущая семья","social":"Социальное предприятие","svo":"Участник СВО или член семьи","unemployed":"Стою на учёте как безработный","innov":"Технологический или научный проект","bizplan":"Уже есть бизнес-план"},"SPHERES":[{"id":"agro","name":"Сельское хозяйство","kids":[{"id":"agro.crop","name":"Растениеводство","kw":["зерн","пшениц","ячмен","подсолнеч","кукуруз","овощ","теплиц","сад","яблок","виноград","ягод","бахч","арбуз","картоф","растениевод","урожа","посев"]},{"id":"agro.livestock","name":"Животноводство","kw":["коров","молок","скот","овец","овц","баран","коз","свин","птиц","курин","куры","курятн","индейк","пчел","пасек","кролик","лошад","животновод","бычк","телят"]},{"id":"agro.aqua","name":"Аквакультура и рыболовство","kw":["рыб","форел","осетр","карп","толстолоб","раки","раков","кревет","пруд","зарыб","мальк","аквакульт","устриц","мидии","мидий","икр","садк","водных живот"]},{"id":"agro.proc","name":"Переработка сельхозпродукции","kw":["сыр","сыровар","мельниц","мука","муки","маслобо","маслоз","консерв","колбас","копчен","переработ","крупы","комбикорм"]}]},{"id":"prod","name":"Производство","kids":[{"id":"prod.food","name":"Пищевое производство","kw":["хлеб","пекарн","кондитер","торт","выпечк","пищев","напит","квас","пивовар","винодел","вино"]},{"id":"prod.mech","name":"Машиностроение, техника и металл","kw":["станк","металл","сварк","завод","детал","машиностро","литье","токар","цех","техник","трактор","комбайн","сельхозтехн","спецтехн","прицеп","запчаст"]},{"id":"prod.light","name":"Лёгкая промышленность и ремёсла","kw":["швей","одежд","шить","мебел","керамик","гончар","ремесл","кожан","текстил","сувенир","столяр"]}]},{"id":"trade","name":"Торговля","kw":["магазин","торгов","маркетплейс","озон","вайлдберр","оптов","розниц","продаж","ларек"]},{"id":"serv","name":"Услуги","kids":[{"id":"serv.tour","name":"Туризм и гостиницы","kw":["гостиниц","туризм","турбаз","глэмпинг","хостел","экскурс","отел","база отдыха","агротур"]},{"id":"serv.food","name":"Общепит","kw":["кафе","ресторан","кофейн","столов","шаурм","пиццер","фудтрак","общепит"]},{"id":"serv.social","name":"Образование и социальные услуги","kw":["детский сад","садик","кружк","репетитор","обучен","школ","уход за","пожил","инклюз","инвалид","социальн"]},{"id":"serv.home","name":"Бытовые услуги","kw":["парикмах","салон","маникюр","ремонт обуви","химчист","автосервис","шиномонтаж","клининг","уборк","бытов"]}]},{"id":"it","name":"IT и технологии","kw":["сайт","приложен","программ","айти","разработ","игр","нейросет","софт","робот","электроник","стартап","it"]},{"id":"build","name":"Строительство","kw":["строй","строит","ремонт квартир","отделк","кровл","бетон"]},{"id":"transport","name":"Транспорт и логистика","kw":["грузоперевоз","перевоз","такси","логист","доставк","склад","грузов"]}],"DISTRICTS":[["Чертковский",1,0,["agro.crop","agro.livestock"]],["Шолоховский",3,0,["agro.crop","serv.tour"]],["Верхнедонской",4,0,["agro.crop","agro.livestock"]],["Миллеровский",1,1,["agro.crop","agro.proc"]],["Кашарский",2,1,["agro.livestock","agro.crop"]],["Боковский",4,1,["agro.crop","agro.livestock"]],["Советский",5,1,["agro.livestock","agro.crop"]],["Тарасовский",0,2,["agro.crop"]],["Каменский",1,2,["agro.crop","prod"]],["Милютинский",3,2,["agro.livestock","agro.crop"]],["Обливский",4,2,["agro.livestock","agro.crop"]],["Красносулинский",0,3,["prod","agro.crop"]],["Белокалитвинский",1,3,["prod","agro.crop"]],["Тацинский",2,3,["agro.crop"]],["Морозовский",3,3,["agro.crop","agro.livestock"]],["Цимлянский",4,3,["agro.aqua","agro.crop","serv.tour"]],["Родионово-Несветайский",0,4,["agro.crop","agro.livestock"]],["Октябрьский",1,4,["prod","agro.crop"]],["Усть-Донецкий",2,4,["agro.crop","agro.aqua"]],["Константиновский",3,4,["agro.crop","agro.aqua"]],["Волгодонской",4,4,["agro.crop","agro.aqua"]],["Дубовский",5,4,["agro.livestock","agro.crop"]],["Куйбышевский",0,5,["agro.crop"]],["Матвеево-Курганский",1,5,["agro.crop","prod.food"]],["Мясниковский",2,5,["agro.crop","prod.food"]],["Аксайский",3,5,["trade","prod","serv.tour"]],["Багаевский",4,5,["agro.crop","agro.aqua"]],["Семикаракорский",5,5,["agro.crop","prod.light","agro.aqua"]],["Мартыновский",6,5,["agro.crop","agro.livestock"]],["Заветинский",7,5,["agro.livestock"]],["Неклиновский",0,6,["agro.crop","agro.aqua","serv.tour"]],["Азовский",1,6,["agro.crop","agro.aqua","serv.tour"]],["Кагальницкий",2,6,["agro.crop"]],["Весёловский",3,6,["agro.crop","agro.aqua"]],["Пролетарский",4,6,["agro.crop","agro.livestock"]],["Орловский",5,6,["agro.livestock","agro.crop"]],["Зимовниковский",6,6,["agro.livestock"]],["Зерноградский",2,7,["agro.crop"]],["Целинский",3,7,["agro.crop"]],["Сальский",4,7,["agro.crop","agro.livestock","agro.proc"]],["Ремонтненский",6,7,["agro.livestock"]],["Егорлыкский",2,8,["agro.crop"]],["Песчанокопский",3,8,["agro.crop"]]],"CITIES":[["Ростов-на-Дону",["trade","it","serv","prod"]],["Таганрог",["prod","serv.tour"]],["Шахты",["prod","trade"]],["Новочеркасск",["prod","serv"]],["Волгодонск",["prod","agro.aqua"]],["Батайск",["trade","transport"]],["Новошахтинск",["prod"]],["Каменск-Шахтинский",["prod"]],["Азов",["serv.tour","agro.aqua"]],["Гуково",["prod"]],["Донецк",["prod"]],["Зверево",["prod"]]],"BASE":[{"id":"guarantee","name":"Поручительство Гарантийного фонда РО","op":"НКО «Гарантийный фонд Ростовской области»","type":"garant","spheres":["*"],"forms":["self","ip","kfh","ul"],"cats":["micro","small","medium"],"minM":0,"min":0,"max":100000000,"rate":2,"term":36,"coll":"none","own":0,"comp":false,"weeks":2,"goals":["*"],"req":[],"url":"https://dongarant.ru/","desc":"Фонд становится поручителем перед банком, лизинговой или факторинговой компанией и закрывает часть залога. Денег сам не даёт, работает в паре с кредитом, займом или лизингом.","conds":["Поручительство по кредитам, займам, лизингу, банковским гарантиям, факторингу","Лимит — до 100 млн ₽ на один бизнес (по данным фонда)"],"geo":"ro"},{"id":"credit_msp","name":"Льготный кредит для МСП (программа Корпорации МСП)","op":"Банки-партнёры Корпорации МСП","type":"credit","spheres":["*"],"forms":["ip","kfh","ul"],"cats":["micro","small","medium"],"minM":0,"min":500000,"max":2000000000,"rate":16.75,"term":120,"coll":"yes","own":0,"comp":false,"weeks":3,"goals":["equip","tech","develop","working","rent"],"req":[],"debtMax":50000,"url":"https://invest.economy.gov.ru/programma-lgotnogo-kreditovaniya-subektov-msp-programma-1764-","desc":"Кредит по ставке ниже рыночной (программа 1764): государство компенсирует банку часть процентов. Ставка привязана к ключевой ставке ЦБ.","conds":["Ставка — ключевая ставка ЦБ + не больше 2,75% (при ключевой 14% — до 16,75%)","Инвестиционный кредит: от 500 тыс. до 2 млрд ₽, до 10 лет"],"geo":"fed"},{"id":"agrocredit","name":"Льготный агрокредит","op":"Банки, уполномоченные Минсельхозом России","type":"credit","spheres":["agro"],"forms":["ip","kfh","ul"],"cats":["micro","small","medium"],"minM":0,"min":500000,"max":100000000,"rate":5,"term":120,"coll":"yes","own":0,"comp":false,"weeks":4,"goals":["equip","tech","raw","working","develop"],"req":[],"url":"https://www.fskmb.ru/funding/financial-instruments/programma-lgotnogo-kreditovaniya-minselkhoza-1528/","desc":"Кредит для сельхозпроизводителей и переработчиков по сниженной ставке (постановление Правительства РФ № 1528).","conds":["Инвестиционный кредит: 1–5% годовых, срок от 2 до 15 лет","Краткосрочный (оборотный): до 12,5% годовых, до 1 года"],"geo":"fed"},{"id":"farm_grant","name":"Единый грант для фермеров (бывшие «Агростартап» и «Семейная ферма»)","op":"Минсельхозпрод Ростовской области","type":"grant","spheres":["agro"],"forms":["plan","ip","kfh"],"minM":0,"min":0,"max":30000000,"coll":"none","own":10,"comp":true,"weeks":16,"goals":["open","equip","tech","raw","develop"],"req":[],"needPlan":true,"byNotice":true,"url":"https://mcx.donland.ru/","desc":"С 2026 года «Агростартап» и грант «Семейная ферма» объединены в одну программу. Чем больше доля своих средств, тем больше может быть грант, максимум до 30 млн ₽.","conds":["До 30 млн ₽ (региональный размер уточнить в Минсельхозпроде РО)","Своих средств от 10% у начинающих до 40% у крупных проектов"],"geo":"ro"},{"id":"aqua_sub","name":"Субсидия рыбоводам на зарыбление и корма","op":"Минсельхозпрод Ростовской области","type":"subsidy","spheres":["agro.aqua"],"forms":["ip","kfh","ul"],"minM":12,"min":0,"coll":"none","own":40,"reimb":true,"comp":false,"weeks":8,"goals":["raw","develop"],"req":[],"byNotice":true,"url":"https://mcx.donland.ru/","desc":"Возмещает часть затрат рыбоводов (аквакультура). Отбор объявляет Минсельхозпрод РО.","conds":["Возмещается до 60% затрат (по последнему отбору, уточнить)","Для ИП и организаций, которые ведут товарное рыбоводство"],"geo":"ro"},{"id":"agro_equip_sub","name":"Субсидия на технику и оборудование для АПК","op":"Минсельхозпрод Ростовской области","type":"subsidy","spheres":["agro"],"forms":["ip","kfh","ul"],"minM":12,"min":0,"coll":"none","own":70,"reimb":true,"comp":false,"weeks":10,"goals":["equip","tech"],"req":[],"byNotice":true,"url":"https://mcx.donland.ru/","desc":"Возмещает часть стоимости новой сельхозтехники отечественного производства. Область продолжает программу в 2026 году.","conds":["Техника отечественного производства, новая","Процент возмещения — по порядку отбора (уточнять)"],"geo":"ro"},{"id":"young_grant","name":"Грант для молодых предпринимателей до 25 лет","op":"Минэкономразвития РО и центр «Мой бизнес»","type":"grant","spheres":["*"],"forms":["self","ip","ul"],"minM":0,"min":100000,"max":500000,"coll":"none","own":25,"comp":true,"weeks":8,"goals":["open","equip","develop","rent"],"req":[],"ageMin":14,"ageMax":25,"needPlan":true,"byNotice":true,"url":"https://мсп.рф","desc":"Федеральная программа для молодых предпринимателей, в Ростовской области заявки принимает региональное министерство экономики.","conds":["Возраст от 14 до 25 лет включительно","От 100 до 500 тыс. ₽"],"geo":"ro"},{"id":"soc_contract","name":"Социальный контракт на открытие своего дела","op":"Органы соцзащиты (заявление через Госуслуги, МФЦ или «Мой бизнес»)","type":"grant","spheres":["*"],"forms":["plan","self","ip","kfh"],"minM":0,"maxM":3,"min":0,"max":350000,"coll":"none","own":0,"comp":false,"weeks":6,"goals":["open","equip","raw"],"req":["lowincome"],"needPlan":true,"url":"https://www.gosuslugi.ru","desc":"Выплата на открытие ИП или самозанятости для тех, у кого доход ниже регионального прожиточного минимума (постановление Правительства РФ № 1160).","conds":["Доход семьи ниже прожиточного минимума в регионе","До 350 тыс. ₽ на ИП или самозанятость, до 200 тыс. ₽ на личное подсобное хозяйство"],"geo":"ro"},{"id":"student_startup","name":"«Студенческий стартап»","op":"Фонд содействия инновациям","type":"grant","spheres":["it","prod"],"forms":["plan"],"minM":0,"maxM":0,"min":0,"max":1000000,"coll":"none","own":0,"comp":true,"weeks":16,"goals":["open","develop"],"req":["student"],"needPlan":true,"byNotice":true,"url":"https://fasie.ru","desc":"Грант 1 млн ₽ студентам и аспирантам на технологический стартап. Конкурс проходит очередями, после победы нужно создать компанию.","conds":["Студенты и аспиранты, граждане РФ","Грант 1 млн ₽"],"geo":"fed"},{"id":"umbrella","name":"«Зонтичное» поручительство Корпорации МСП","op":"Корпорация МСП через банки-партнёры","type":"garant","spheres":["*"],"forms":["ip","kfh","ul"],"cats":["micro","small","medium"],"minM":0,"min":0,"max":1000000000,"rate":0,"term":180,"coll":"none","own":0,"comp":false,"weeks":3,"goals":["*"],"req":[],"url":"https://invest.economy.gov.ru/zontichnye-poruchitelstva-ao-korporaciya-msp-","desc":"Банк сам оформляет поручительство Корпорации МСП вместе с кредитом, если не хватает залога. Отдельно никуда обращаться не нужно.","conds":["Покрывает до 50% суммы кредита, до 1 млрд ₽","Бесплатно для предпринимателя — комиссию платит банк"],"geo":"fed"},{"id":"prom_ipoteka","name":"Промышленная ипотека","op":"Банки, уполномоченные Минпромторгом России","type":"credit","spheres":["prod","agro.proc","it"],"forms":["ip","ul"],"minM":0,"min":0,"max":500000000,"rate":5,"term":84,"coll":"yes","own":0,"comp":true,"weeks":6,"goals":["rent","develop"],"req":[],"url":"https://kontur.ru/articles/1969","desc":"Льготный кредит на покупку, строительство или реконструкцию производственного помещения (постановление Правительства РФ № 1570).","conds":["До 500 млн ₽, срок до 7 лет","5% годовых, для технологических компаний 3% (ставка может зависеть от ключевой ставки — уточнять)"],"geo":"fed"},{"id":"agromotivator","name":"Грант «Агромотиватор» для участников СВО","op":"Минсельхозпрод Ростовской области","type":"grant","spheres":["agro"],"forms":["plan","ip","kfh"],"minM":0,"min":5000000,"max":7000000,"coll":"none","own":0,"comp":true,"weeks":16,"goals":["open","equip","tech","raw","develop"],"req":["svo"],"debtMax":10000,"needPlan":true,"byNotice":true,"url":"https://xn--90aivcdt6dxbc.xn--p1ai/articles/news/veterany-i-uchastniki-svo-smogut-poluchit-grant-dlya-nachala-biznesa-na-sele/","desc":"Грант ветеранам и участникам СВО на запуск сельского бизнеса. В Ростовской области действует с 2026 года.","conds":["От 5 до 7 млн ₽","Потратить деньги за 18 месяцев"],"geo":"ro"},{"id":"svo_start","name":"Поддержка участников СВО на открытие бизнеса","op":"Центр «Мой бизнес» Ростовской области","type":"grant","spheres":["*"],"forms":["plan","self","ip","ul"],"minM":0,"min":0,"coll":"none","own":10,"comp":true,"weeks":8,"goals":["open","equip","rent","develop"],"req":["svo"],"needPlan":true,"byNotice":true,"url":"https://mbrostov.ru","desc":"Для ветеранов СВО и их семей: гранты с пониженной долей своих средств, соцконтракт без проверки дохода, обучение «СВОй бизнес».","conds":["Своих средств от 10%, без ограничения по сроку регистрации бизнеса","Сумма гранта в области — уточнять в «Мой бизнес»"],"geo":"ro"},{"id":"agrotourism","name":"Субсидия на сельский туризм","op":"Минсельхозпрод Ростовской области","type":"subsidy","spheres":["agro","serv.tour"],"forms":["ip","kfh","ul"],"cats":["micro","small"],"minM":0,"min":0,"max":5000000,"coll":"none","own":50,"reimb":true,"comp":true,"weeks":12,"goals":["develop","equip","open"],"req":[],"needPlan":true,"byNotice":true,"url":"https://www.donland.ru/activity/2985/","desc":"Возмещает половину затрат сельхозпроизводителя на гостевой дом, экскурсии, дегустации и другую инфраструктуру сельского туризма.","conds":["Возмещается до 50% затрат, не больше 5 млн ₽","Для максимума нужно вложить от 10 млн ₽"],"geo":"ro"},{"id":"tour_infra","name":"Субсидии на кемпинги, глэмпинги и турпроекты у М-4","op":"Минэкономразвития Ростовской области","type":"subsidy","spheres":["serv.tour"],"forms":["ip","ul"],"minM":0,"min":0,"coll":"none","own":0,"reimb":true,"comp":true,"weeks":12,"goals":["open","develop","equip"],"req":[],"needPlan":true,"byNotice":true,"url":"https://south.vedomosti.ru/south/news/2026/02/11/1175534-glempingov","desc":"В 2026 году область направляет около 171 млн ₽ на туризм: кемпинги, проекты вдоль трассы М-4 «Дон», модульные глэмпинги (нацпроект «Туризм и индустрия гостеприимства»).","conds":["Кемпинги — 108,8 млн ₽, проекты у М-4 — 62,4 млн ₽, модульные средства размещения — 3,1 млн ₽","Отдельно 91,9 млн ₽ на модульные глэмпинги в 2026–2027 годах"],"geo":"ro"},{"id":"czn_help","name":"Единовременная помощь безработным на открытие дела","op":"Центр занятости населения","type":"grant","spheres":["*"],"forms":["plan"],"minM":0,"maxM":0,"min":0,"max":100000,"coll":"none","own":0,"comp":false,"weeks":6,"goals":["open","equip","raw"],"req":["unemployed"],"needPlan":true,"url":"https://www.donland.ru/documents/2865/","desc":"Выплата безработному, который регистрируется как ИП, КФХ, юрлицо или самозанятый. Сначала нужно встать на учёт в центре занятости.","conds":["Около 96–100 тыс. ₽ (уточнять в центре занятости)","Нужен статус безработного"],"geo":"ro"},{"id":"umnik","name":"Грант «УМНИК»","op":"Фонд содействия инновациям","type":"grant","spheres":["it","prod"],"forms":["plan"],"minM":0,"maxM":0,"min":0,"max":500000,"coll":"none","own":0,"comp":true,"weeks":16,"goals":["open","develop"],"req":["innov"],"ageMin":18,"ageMax":35,"byNotice":true,"url":"https://fasie.ru/programs/programma-umnik/","desc":"Грант молодому исследователю на научно-техническую идею. Компанию создавать не нужно, грант выдаётся человеку.","conds":["Граждане РФ от 18 до 35 лет","500 тыс. ₽ двумя частями: 200 тыс. и 300 тыс. ₽ (по данным вузов, уточнить)"],"geo":"fed"},{"id":"fsi_start","name":"Грант «Старт-1»","op":"Фонд содействия инновациям","type":"grant","spheres":["it","prod"],"forms":["ul"],"cats":["micro","small"],"minM":0,"maxM":24,"min":0,"max":5000000,"coll":"none","own":0,"comp":true,"weeks":16,"goals":["develop","open"],"req":["innov"],"needPlan":true,"byNotice":true,"url":"https://fasie.ru","desc":"Грант молодой технологической компании на НИОКР: доказать, что технология работает, и сделать прототип.","conds":["До 5 млн ₽ на 1 год","Своих средств не требуется (на следующем этапе «Старт-2» — от 15%)"],"geo":"fed"},{"id":"gos_property","name":"Льготная аренда государственного и муниципального имущества","op":"Минимущество РО и администрации районов","type":"property","spheres":["*"],"forms":["self","ip","kfh","ul"],"minM":0,"min":0,"max":0,"coll":"none","own":0,"comp":true,"weeks":6,"goals":["rent","open"],"req":[],"url":"https://mbrostov.ru/pages/mery-podderzki-organov-vlasti","desc":"Помещения и земля из специальных перечней сдаются только малому бизнесу и самозанятым, на долгий срок и часто со скидкой (статья 18 закона № 209-ФЗ).","conds":["Объекты из перечней имущества для МСП и самозанятых","Долгосрочная аренда, возможна льготная ставка"],"geo":"ro"},{"id":"leasing","name":"Льготный лизинг оборудования","op":"АО «МСП Лизинг» (группа Корпорации МСП)","type":"leasing","spheres":["*"],"forms":["ip","kfh","ul"],"cats":["micro","small","medium"],"minM":12,"min":3000000,"max":200000000,"rate":6,"term":36,"coll":"none","own":10,"comp":false,"weeks":3,"goals":["equip","tech"],"req":[],"url":"https://corpmsp.ru/to-business/lizingovaya-podderzhka/","desc":"Новое оборудование в лизинг по сниженной ставке. Предмет лизинга сам служит обеспечением. Заявка — через МСП.РФ.","conds":["6% годовых на российское оборудование, 8% — на иностранное","Оборудование стоимостью от 3 млн ₽"],"geo":"fed"},{"id":"frp_loan","name":"Заём Фонда развития промышленности РО","op":"Фонд развития промышленности Ростовской области","type":"zaem","spheres":["prod","agro.proc"],"forms":["ip","ul"],"minM":12,"min":5000000,"max":100000000,"rate":5,"term":60,"coll":"yes","own":20,"comp":true,"weeks":10,"goals":["equip","develop"],"req":[],"needPlan":true,"url":"https://frp61.ru/programmy-finansirovaniya/programmy-finansirovaniya-rfrp-ro","desc":"Целевой заём на модернизацию и запуск производства под низкий процент. Только для обрабатывающих производств.","conds":["«Снижение издержек»: 5–60 млн ₽, до 5%, до 5 лет","«Комплектующие»: 5–60 млн ₽, до 2%, до 3 лет"],"geo":"ro"},{"id":"social_grant","name":"Грант социальным предприятиям","op":"Центр «Мой бизнес» Ростовской области","type":"grant","spheres":["*"],"forms":["ip","ul"],"minM":0,"min":100000,"max":500000,"coll":"none","own":25,"comp":true,"weeks":8,"goals":["open","equip","develop","rent"],"req":["social"],"needPlan":true,"byNotice":true,"url":"https://mbrostov.ru","desc":"Грант бизнесу со статусом социального предприятия. Заявки принимает центр «Мой бизнес», решение — конкурсная комиссия.","conds":["Статус социального предприятия (в реестре)","От 100 до 500 тыс. ₽"],"geo":"ro"},{"id":"export","name":"Компенсация участия в выставках и экспортные консультации","op":"Центр поддержки экспорта РО и Российский экспортный центр","type":"subsidy","spheres":["*"],"forms":["ip","kfh","ul"],"minM":12,"min":0,"max":700000,"coll":"none","own":0,"reimb":true,"comp":false,"weeks":6,"goals":["export"],"req":[],"url":"https://www.exportcenter.ru/services/spetsialnye-programmy-po-podderzhke-eksporta/exhibitions-and-business-missions/gospodderzhka-zarubezhnye-vystavki-i-yarmarki/","desc":"Помощь с выходом на зарубежные рынки: выставки, сертификация, поиск покупателей.","conds":["Компенсация части затрат на зарубежную выставку: до 700 тыс. ₽ на мероприятие для МСП","Число выставок в год ограничено (3–5, уточнять на «Мой экспорт»)"],"geo":"ro"},{"id":"consult","name":"Бесплатные консультации и помощь с бизнес-планом","op":"Центр «Мой бизнес» Ростовской области","type":"consult","spheres":["*"],"forms":["plan","self","ip","kfh","ul"],"minM":0,"min":0,"max":0,"coll":"none","own":0,"comp":false,"weeks":1,"goals":["*"],"req":[],"url":"https://mbrostov.ru","desc":"Юрист, бухгалтер, маркетолог, помощь с заявкой на грант и бизнес-планом. Бесплатно.","conds":["Бесплатно для предпринимателей и тех, кто только планирует бизнес","Нужна запись на консультацию"],"geo":"ro"}],"EXAMPLES":{"start":{"label":"Студент","status":"plan","emp":0,"rev":0,"district":"г. Ростов-на-Дону","pAge":20,"age":"0","sphere":"it","sphereText":"хочу делать приложение для фермеров","goal":"open","amount":800000,"types":[],"own":0,"coll":"none","comp":true,"young":true,"student":true,"lowincome":false,"social":false,"innov":true,"debt":"none"},"jobless":{"label":"Безработный","status":"plan","district":"г. Шахты","pAge":29,"age":"0","sphere":"serv.home","goal":"open","amount":300000,"own":0,"coll":"none","unemployed":true,"lowincome":true},"self":{"label":"Самозанятый","status":"self","district":"Цимлянский район","pAge":24,"age":"lt12","sphere":"serv.food","goal":"equip","amount":400000,"own":25,"coll":"none","comp":true},"ip":{"label":"ИП","status":"ip","emp":5,"rev":9,"district":"г. Таганрог","pAge":36,"age":"12_24","sphere":"prod.food","goal":"equip","amount":1500000,"own":20,"coll":"partial","comp":true,"bizplan":true},"kfh":{"label":"КФХ","status":"kfh","emp":4,"rev":6,"district":"Пролетарский район","pAge":41,"age":"24_60","sphere":"agro.aqua","sphereText":"выращиваю карпа и раков в прудах","goal":"raw","amount":2000000,"types":[],"own":20,"coll":"none","comp":true,"young":false,"student":false,"lowincome":false,"social":false,"debt":"none"},"ul":{"label":"ООО","status":"ul","emp":40,"rev":150,"district":"г. Новочеркасск","pAge":47,"age":"gt60","sphere":"prod.mech","goal":"equip","amount":25000000,"own":20,"coll":"yes","comp":true,"bizplan":true}}};
+
+(() => {
+'use strict';
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nf = n => Math.round(n).toLocaleString('ru-RU');
+const money = n => n == null ? 'уточняется' : nf(n) + ' ₽';
+const SPH = {}; D.SPHERES.forEach(s => { SPH[s.id] = s; (s.kids || []).forEach(k => SPH[k.id] = k); });
+const sphName = id => id === '*' ? 'все сферы' : (SPH[id] ? SPH[id].name : id);
+const FOR = {student:'студентов и аспирантов', lowincome:'малоимущих семей', social:'социальных предприятий', svo:'участников СВО и их семей', unemployed:'безработных, стоящих на учёте', innov:'технологических (научных) проектов', bizplan:'тех, у кого есть бизнес-план'};
+const AGEM = {'0':0, lt12:6, '12_24':18, '24_60':40, gt60:72};
+
+let profile = null, results = [], cmp = [];
+
+function fromExample(e) {
+  const p = {status:e.status, pAge:e.pAge, district:e.district, age:String(AGEM[e.age] ?? 0), sphere:e.sphere, goal:e.goal, amount:e.amount, own:e.own, coll:e.coll};
+  return p;
+}
+
+/* ---- анкета ---- */
+const opts = (o, sel) => Object.entries(o).map(([k, v]) => `<option value="${k}"${k === sel ? ' selected' : ''}>${esc(v)}</option>`).join('');
+function buildForm() {
+  $('#fStatus').innerHTML = opts(D.FORM);
+  $('#fGoal').innerHTML = opts(D.GOAL);
+  $('#fColl').innerHTML = opts(D.COLL);
+  $('#fSphere').innerHTML = D.SPHERES.map(s => s.kids ? `<optgroup label="${esc(s.name)}">${s.kids.map(k => `<option value="${k.id}">${esc(k.name)}</option>`).join('')}</optgroup>` : `<option value="${s.id}">${esc(s.name)}</option>`).join('');
+  const places = [...D.CITIES.map(c => 'г. ' + c[0]), ...D.DISTRICTS.map(d => d[0] + ' район').sort()];
+  $('#fDistrict').innerHTML = places.map(p => `<option>${esc(p)}</option>`).join('');
+  $('#exRow').insertAdjacentHTML('beforeend', Object.entries(D.EXAMPLES).map(([k, e]) => `<button type="button" class="btn" data-ex="${k}">${esc(e.label)}</button>`).join(''));
+}
+function fillForm(p) {
+  $('#fStatus').value = p.status; $('#fPAge').value = p.pAge || ''; $('#fDistrict').value = p.district;
+  $('#fAge').value = p.age; $('#fSphere').value = p.sphere; $('#fGoal').value = p.goal;
+  $('#fAmount').value = p.amount || ''; $('#fOwn').value = p.own || 0; $('#fColl').value = p.coll;
+}
+function readForm() {
+  const p = {status:$('#fStatus').value, pAge:+$('#fPAge').value || 0, district:$('#fDistrict').value, age:$('#fAge').value,
+    sphere:$('#fSphere').value, goal:$('#fGoal').value, amount:+$('#fAmount').value || 0, own:+$('#fOwn').value || 0, coll:$('#fColl').value};
+  return p;
+}
+
+/* ---- подбор (упрощённый) ---- */
+function sphereFits(p, s) { return p.spheres.some(x => x === '*' || x === s || s.startsWith(x + '.') || x.startsWith(s + '.')); }
+function evaluate(p, pr) {
+  const ch = [], add = (ok, t, hard) => ch.push({ok, t, hard:!!hard});
+  const months = +pr.age;
+  if (p.forms.includes(pr.status)) add(true, 'Форма бизнеса подходит');
+  else if (pr.status === 'plan') add(null, 'Сначала нужно зарегистрироваться: ' + p.forms.map(f => D.FORM[f]).join(', '));
+  else add(false, 'Не для вашей формы бизнеса', true);
+  if (!sphereFits(p, pr.sphere)) add(false, 'Другая сфера: ' + p.spheres.map(sphName).join(', '));
+  if (p.minM && p.minM > months) add(false, 'Бизнес должен работать от ' + p.minM + ' мес.');
+  if (p.maxM != null && months > p.maxM) add(false, 'Только для нового бизнеса');
+  if ((p.ageMin || p.ageMax) && pr.pAge && ((p.ageMin && pr.pAge < p.ageMin) || (p.ageMax && pr.pAge > p.ageMax))) add(false, `Возраст ${p.ageMin}–${p.ageMax} лет`, true);
+  // особых условий в анкете нет: мера для отдельной категории показывается с оговоркой
+  (p.req || []).forEach(r => add(null, 'Только для: ' + FOR[r]));
+  if (p.max && pr.amount > p.max) add(null, 'Покроет не всю сумму: максимум ' + money(p.max));
+  if (p.coll === 'yes' && pr.coll !== 'yes') add(null, 'Нужен залог');
+  if (!p.reimb && p.own > pr.own) add(null, `Нужно своих средств ${p.own}%`);
+  if (p.needPlan) add(null, 'Нужен бизнес-план');
+  if (p.byNotice) add(null, 'Приём заявок по объявлению');
+  const status = ch.some(c => c.ok === false) ? 'no' : ch.some(c => c.ok === null) ? 'check' : 'ok';
+  // выше — меры, которые дают деньги и созданы для сферы или категории человека; поручительство, аренда и консультации — ниже
+  const BASEPTS = {grant:30, subsidy:26, zaem:24, credit:22, leasing:20, property:8, garant:6, consult:4};
+  let score = (BASEPTS[p.type] ?? 10) - (p.rate || 0) * 0.5 - ch.filter(c => c.ok === null).length * 4;
+  if (!p.spheres.includes('*')) score += 10;
+  if ((p.req || []).length) score -= 10; // мера для отдельной категории ниже общих
+  return {p, status, ch, score};
+}
+function compute() {
+  results = D.BASE.map(p => evaluate(p, profile)).filter(r => !r.ch.some(c => c.hard));
+  const ord = {ok:0, check:0, no:1}; // оговорки уже снижают балл, поэтому «с оговорками» не уходят ниже мер без денег
+  const gOrd = {ro:0, fed:1}; // областные меры выше, федеральные (операторы далеко) в конце своей группы
+  results.sort((a, b) => ord[a.status] - ord[b.status] || gOrd[a.p.geo] - gOrd[b.p.geo] || b.score - a.score);
+  cmp = cmp.filter(id => results.some(r => r.p.id === id && r.status !== 'no'));
+}
+const ST = {ok:'Подходит', check:'Подходит с оговорками', no:'Не подходит'};
+const sumText = p => p.max === 0 ? 'бесплатно' : p.max == null ? 'уточняется' : (p.min ? `${money(p.min)} – ${money(p.max)}` : 'до ' + money(p.max));
+const rateText = p => p.rate != null ? p.rate + '%' : p.type === 'grant' ? 'безвозмездно' : p.reimb ? 'возврат части затрат' : '—';
+function renderResults() {
+  const good = results.filter(r => r.status !== 'no').length;
+  const onlyRo = ($('input[name="geo"]:checked') || {}).value === 'ro';
+  const shown = onlyRo ? results.filter(r => r.p.geo === 'ro') : results;
+  $('#resSub').textContent = `Подходит ${good} из ${results.length}. ${profile.district}, ${sphName(profile.sphere).toLowerCase()}, нужно ${money(profile.amount)}.` + (onlyRo ? ` Скрыто федеральных мер: ${results.length - shown.length}.` : '');
+  $('#resList').innerHTML = shown.map(r => `<div class="card">
+    <div class="top"><h3>${esc(r.p.name)}</h3><span class="st ${r.status}">${ST[r.status]}</span></div>
+    <div class="kv">${esc(D.TYPE[r.p.type])} · ${esc(sumText(r.p))} · ${esc(rateText(r.p))} · ${r.p.geo === 'ro' ? 'Ростовская область' : 'федеральная, действует и в Ростовской области'}</div>
+    <p>${esc(r.p.desc || '')}</p>
+    <ul>${r.ch.filter(c => c.ok !== true).slice(0, 3).map(c => `<li>${esc(c.t)}</li>`).join('')}</ul>
+    ${r.status !== 'no' ? `<label class="row" style="font-size:14px"><input type="checkbox" data-cmp="${r.p.id}" style="width:auto"${cmp.includes(r.p.id) ? ' checked' : ''}>В сравнение</label>` : ''}
+  </div>`).join('');
+}
+
+/* ---- сравнение ---- */
+function payment(p, amount) {
+  const A = p.max ? Math.min(amount, p.max) : amount;
+  if (!['credit', 'zaem', 'leasing'].includes(p.type) || !p.term) return null;
+  const S = p.type === 'leasing' ? A * (1 - (p.own || 0) / 100) : A, r = (p.rate || 0) / 1200, n = p.term;
+  return r ? S * r / (1 - Math.pow(1 + r, -n)) : S / n;
+}
+function renderCompare() {
+  const list = cmp.map(id => results.find(r => r.p.id === id)).filter(Boolean);
+  if (!list.length) { $('#cmpTbl').innerHTML = '<p class="muted">Пока ничего не выбрано.</p>'; return; }
+  const rows = [
+    ['Вид', p => D.TYPE[p.type]], ['Сумма', sumText], ['Ставка', rateText],
+    ['Срок', p => p.term ? p.term + ' мес.' : '—'], ['Залог', p => p.coll === 'yes' ? 'нужен' : 'не нужен'],
+    ['Своих средств', p => (p.own || 0) + '%'], ['Платёж в месяц', p => { const x = payment(p, profile.amount); return x ? '≈ ' + money(x) : '—'; }],
+    ['Решение', p => p.weeks ? `≈ ${p.weeks} нед.` : '—']
+  ];
+  $('#cmpTbl').innerHTML = `<table><tr><th></th>${list.map(r => `<th>${esc(r.p.name)}</th>`).join('')}</tr>` +
+    rows.map(([t, f]) => `<tr><td>${t}</td>${list.map(r => `<td>${esc(f(r.p))}</td>`).join('')}</tr>`).join('') +
+    `<tr><td>Кто выдаёт</td>${list.map(r => `<td>${esc(r.p.op || '—')}</td>`).join('')}</tr>` +
+    `<tr><td>Подробнее</td>${list.map(r => `<td>${r.p.url ? `<a href="${esc(r.p.url)}" target="_blank" rel="noopener">${esc(new URL(r.p.url).hostname.replace(/^www\./, ''))} ↗</a>` : '—'}</td>`).join('')}</tr>` + '</table>';
+}
+
+/* ---- поиск по районам и городам ---- */
+const norm = s => String(s || '').toLowerCase().replace(/ё/g, 'е').trim();
+const PLACES = [
+  ...D.CITIES.map(c => ({name:'г. ' + c[0], short:c[0], city:true, specs:c[1]})),
+  ...D.DISTRICTS.map(d => ({name:d[0] + ' район', short:d[0], city:false, specs:d[3]})).sort((a, b) => a.short.localeCompare(b.short, 'ru'))
+];
+// сферы по словам запроса: «рыба» → аквакультура, «зерно» → растениеводство
+function spheresOf(q) {
+  const words = norm(q).split(/[^a-zа-я0-9]+/).filter(w => w.length >= 3);
+  if (!words.length) return [];
+  return Object.values(SPH).filter(s => norm(s.name).split(/[^a-zа-я0-9]+/).some(n => words.some(w => n.startsWith(w))) ||
+    (s.kw || []).some(kw => words.some(w => w.startsWith(norm(kw)) || (w.length >= 4 && norm(kw).startsWith(w))))).map(s => s.id);
+}
+const specHit = (specs, ids) => specs.some(sp => ids.some(id => sp === id || sp.startsWith(id + '.') || id.startsWith(sp + '.')));
+// «Сальск» → Сальский район, «Азов» → г. Азов и Азовский район: сравниваем по основе слова
+const stem = s => norm(s).replace(/(ский|ской|цкий|ий|ый|ой|ая|ое|ск)$/, '');
+function placeMatch(pl, q) {
+  const n = norm(pl.short), t = norm(q);
+  if (n.includes(t)) return 2;
+  const a = stem(n), b = stem(t);
+  return b.length >= 3 && (a.startsWith(b) || b.startsWith(a)) ? 1 : 0;
+}
+function placePrograms(pl) {
+  return D.BASE.filter(p => !p.spheres.includes('*') && pl.specs.some(s => p.spheres.some(x => x === s || s.startsWith(x + '.') || x.startsWith(s + '.'))));
+}
+function renderPlaces() {
+  const q = $('#plQ').value, kind = ($('input[name="plk"]:checked') || {}).value || 'all';
+  let list = PLACES.filter(p => kind === 'all' || (kind === 'c') === p.city), why = '';
+  // пустой поиск — без карточек, список названий открывается кнопкой ▾
+  if (!norm(q)) {
+    $('#plCount').textContent = `Всего мест: ${list.length}. Нажмите ▾ справа от поиска, чтобы выбрать из списка, или начните вводить.`;
+    $('#plList').innerHTML = '';
+    return;
+  }
+  // выбрано из выпадающего списка — показываем ровно это место
+  const exact = PLACES.find(p => norm(p.name) === norm(q));
+  if (exact) list = [exact];
+  else {
+    const byName = list.map(p => [p, placeMatch(p, q)]).filter(x => x[1]).sort((a, b) => b[1] - a[1]).map(x => x[0]);
+    const ids = spheresOf(q);
+    const bySphere = ids.length ? list.filter(p => !byName.includes(p) && specHit(p.specs, ids)) : [];
+    list = [...byName, ...bySphere];
+    if (bySphere.length) why = `По занятию «${q.trim()}» (${ids.map(sphName).join(', ').toLowerCase()}): ${bySphere.length}. `;
+  }
+  const general = D.BASE.filter(p => p.spheres.includes('*')).length;
+  $('#plCount').textContent = list.length ? `${why}Найдено: ${list.length}.` : 'Ничего не нашлось. Проверьте название или напишите короче, например «Азов».';
+  $('#plList').innerHTML = list.map(pl => {
+    const progs = placePrograms(pl);
+    return `<div class="card">
+      <div class="top"><h3>${esc(pl.name)}</h3><span class="tag">${pl.city ? 'город' : 'район'}</span></div>
+      <div class="kv">Чем живёт: ${esc(pl.specs.map(sphName).join(', '))}</div>
+      <p style="font-size:14px">Отраслевые меры поддержки: ${progs.length ? progs.map(p => p.url ? `<a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.name)}</a>` : esc(p.name)).join('; ') : 'нет'}. Ещё ${general} мер доступны в любом районе.</p>
+      <div class="row"><button type="button" class="btn" data-use="${esc(pl.name)}">Подобрать меры для этого места</button></div>
+    </div>`;
+  }).join('');
+}
+
+function cmpCount(msg, alarm) {
+  const el = $('#cmpCount');
+  el.textContent = msg || `Выбрано: ${cmp.length} из 3.`;
+  el.classList.toggle('alarm', !!alarm);
+}
+
+/* ---- одна страница ---- */
+const jump = v => $(`[data-view="${v}"]`).scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'start'});
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-ex],[data-use],[data-pick]'); if (!t) return;
+  if (t.dataset.pick) { $('#plQ').value = t.dataset.pick; dropToggle(false); renderPlaces(); }
+  else if (t.dataset.ex) { fillForm(fromExample(D.EXAMPLES[t.dataset.ex])); $$('[data-ex]').forEach(b => b.setAttribute('aria-pressed', String(b === t))); }
+  else if (t.dataset.use) { $('#fDistrict').value = t.dataset.use; jump('form'); }
+});
+/* выпадающий список районов и городов у поиска */
+function dropFill() {
+  const q = $('#plQ').value, kind = ($('input[name="plk"]:checked') || {}).value || 'all';
+  let list = PLACES.filter(p => kind === 'all' || (kind === 'c') === p.city);
+  // введено часть названия — в списке только подходящие; выбранное целиком — снова все
+  if (norm(q) && !PLACES.some(p => norm(p.name) === norm(q))) {
+    const hit = list.filter(p => placeMatch(p, q));
+    if (hit.length) list = hit;
+  }
+  $('#plDrop').innerHTML = list.map(p => `<li role="option"><button type="button" data-pick="${esc(p.name)}">${esc(p.name)}</button></li>`).join('');
+}
+function dropToggle(open) {
+  if (open) dropFill();
+  $('#plDrop').hidden = !open;
+  $('#plArrow').setAttribute('aria-expanded', String(open));
+}
+$('#plArrow').addEventListener('click', () => dropToggle($('#plDrop').hidden));
+document.addEventListener('click', e => { if (!e.target.closest('.combo')) dropToggle(false); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') dropToggle(false); });
+$('#plQ').addEventListener('input', () => { renderPlaces(); if (!$('#plDrop').hidden) dropFill(); });
+$('#plKind').addEventListener('change', () => { renderPlaces(); if (!$('#plDrop').hidden) dropFill(); });
+document.addEventListener('change', e => {
+  if (e.target.name === 'geo') { renderResults(); return; }
+  const id = e.target.dataset && e.target.dataset.cmp;
+  if (id) {
+    if (e.target.checked) {
+      if (cmp.length >= 3) { e.target.checked = false; cmpCount('Уже выбрано 3 из 3. Чтобы добавить эту меру, снимите галочку с другой.', true); return; }
+      cmp.push(id);
+    } else cmp = cmp.filter(x => x !== id);
+    renderCompare(); cmpCount();
+  }
+});
+function showResults() { $('#resWrap').hidden = false; renderResults(); renderCompare(); cmpCount(); }
+$('#f').addEventListener('submit', e => {
+  e.preventDefault(); profile = readForm(); compute(); showResults(); save(); jump('res');
+});
+
+/* ---- запоминаем всё в браузере: анкету, подбор, сравнение, поиск и место на странице ---- */
+const KEY = 'fnmsp-lite.v1';
+function save() {
+  try {
+    localStorage.setItem(KEY, JSON.stringify({
+      form:readForm(), shown:!$('#resWrap').hidden, profile, cmp,
+      ex:($('[data-ex][aria-pressed="true"]') || {dataset:{}}).dataset.ex || '',
+      plQ:$('#plQ').value, plk:($('input[name="plk"]:checked') || {}).value || 'all', geo:($('input[name="geo"]:checked') || {}).value || 'all', y:Math.round(scrollY)
+    }));
+  } catch (e) { /* хранилище недоступно — просто не запоминаем */ }
+}
+function load() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
+let saveT = 0;
+const saveSoon = () => { clearTimeout(saveT); saveT = setTimeout(save, 250); };
+['input', 'change', 'click'].forEach(ev => document.addEventListener(ev, saveSoon));
+addEventListener('scroll', saveSoon, {passive:true});
+addEventListener('pagehide', save);
+
+/* сброс анкеты — со второго нажатия, чтобы не стереть случайно */
+const BLANK = {status:'ip', pAge:'', district:'г. Ростов-на-Дону', age:'0', sphere:D.SPHERES[0].kids[0].id, goal:'open', amount:'', own:0, coll:'none'};
+let resetArm = 0;
+$('#fReset').addEventListener('click', () => {
+  const b = $('#fReset');
+  if (!resetArm) {
+    b.textContent = 'Точно сбросить? Нажмите ещё раз';
+    resetArm = setTimeout(() => { resetArm = 0; b.textContent = 'Сбросить анкету'; }, 4000);
+    return;
+  }
+  clearTimeout(resetArm); resetArm = 0; b.textContent = 'Сбросить анкету';
+  fillForm(BLANK); profile = {...BLANK}; cmp = []; results = [];
+  $$('[data-ex]').forEach(x => x.setAttribute('aria-pressed', 'false'));
+  $('#resWrap').hidden = true;
+  $('#resSub').textContent = 'Заполните анкету и нажмите «Подобрать», и здесь появятся подходящие меры.';
+  renderCompare(); save();
+});
+
+buildForm();
+history.scrollRestoration = 'manual';
+const st = load();
+if (st && st.form) {
+  fillForm(st.form);
+  const g = $(`input[name="geo"][value="${st.geo}"]`); if (g) g.checked = true;
+  if (st.ex) $$('[data-ex]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.ex === st.ex)));
+  if (st.shown && st.profile) { profile = st.profile; compute(); cmp = (st.cmp || []).filter(id => results.some(r => r.p.id === id && r.status !== 'no')); showResults(); }
+  $('#plQ').value = st.plQ || '';
+  const r = $(`input[name="plk"][value="${st.plk}"]`); if (r) r.checked = true;
+} else {
+  profile = fromExample(D.EXAMPLES.start); fillForm(profile);
+}
+renderPlaces();
+if (st && st.y) requestAnimationFrame(() => scrollTo(0, st.y));
+})();
+</script>
